@@ -1,13 +1,21 @@
 import restaurant.entity.User
 import restaurant.ui.ConsoleOptionChooser
+import restaurant.ui.UserContext
 
+val optionChooser: ConsoleOptionChooser = ConsoleOptionChooser()
+var currentUser: User = optionChooser.authorize()
 
 fun main(args: Array<String>) {
 
-    val optionChooser: ConsoleOptionChooser = ConsoleOptionChooser()
+    try {
+        while (true) {
+            println("Current user now: ${currentUser.login}")
+            optionChooser.getConsoleMenu(currentUser)
+        }
 
-    var currentUser: User = optionChooser.authorize()
-    println("Current user now: ${currentUser.login}")
+    } catch (e: Exception) {
+        println(e.message)
+    }
 
 
 }

@@ -1,4 +1,4 @@
-package restaurant.ui
+package restaurant.ui.enums
 
 enum class AuthOptions {
     SIGN_IN,

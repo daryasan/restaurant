@@ -10,6 +10,8 @@ import restaurant.exceptions.WrongAuthorizationException
 
 class AuthorizatorDB(val db: DataBaseDAO) : Authorizator {
 
+
+
     // creating new user
     override fun signUp(login: String, password: String, isAdmin: Boolean): User {
 

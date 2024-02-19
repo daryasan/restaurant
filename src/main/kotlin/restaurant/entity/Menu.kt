@@ -1,4 +1,8 @@
 package restaurant.entity
 
-class Menu {
-}
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class Menu(
+    var dishes: MutableList<Dish>
+)

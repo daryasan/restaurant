@@ -1,19 +1,12 @@
 package restaurant.ui
 
 import restaurant.exceptions.UIException
+import restaurant.ui.enums.AdminOptions
+import restaurant.ui.enums.AuthOptions
 
 class Checker {
 
-    fun signInOrSignUp(): AuthOptions {
-
-        val option: Int = checkRangeNumberInput(1, 2)
-        when (option) {
-            1 -> return AuthOptions.SIGN_IN
-            2 -> return AuthOptions.SIGN_UP
-        }
-        throw UIException("Wrong input!")
-    }
-
+    // check inputs
     fun checkStringInput(
         errorMessage: String =
             "Nothing entered. Please try again:"
@@ -42,6 +35,18 @@ class Checker {
         throw UIException(errorMessage)
     }
 
+    fun checkIntInput(
+        errorMessage: String =
+            "Wrong number entered. Please try again:"
+    ): Int {
+        var line = checkStringInput()
+        while (line.toIntOrNull() == null && line.toIntOrNull()!! < 0) {
+            println(errorMessage)
+            line = checkStringInput()
+        }
+        return line.toInt()
+    }
+
     fun checkRangeNumberInput(
         leftBorder: Int,
         rightBorder: Int,
@@ -63,5 +68,7 @@ class Checker {
         return num
 
     }
+
+
 
 }
