@@ -1,6 +1,6 @@
 package restaurant.ui
 
-import restaurant.entity.users.User
+import restaurant.entity.User
 
 interface OptionChooser {
 

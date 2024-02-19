@@ -4,8 +4,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import restaurant.entity.users.User
-import restaurant.exceptions.EmptyFileException
+import restaurant.entity.User
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
@@ -13,21 +12,15 @@ import java.nio.file.Paths
 
 class RestaurantSerializer {
 
-    private val path = "resources/jsonDB/"
+    private val path = "src/main/resources/jsonDB/"
     val userPath = "${path}users.json"
 
     // serialize any type of array in program
-    fun <T> serialize(list: MutableList<T>) {
-
-        // choose path
-        var pathToWrite: String = path
-        if (list.isNotEmpty() && list[0] is User) {
-            pathToWrite = userPath
-        }
+    fun serializeUsers(list: MutableList<User>) {
 
         val jsonArray = jacksonObjectMapper().writeValueAsString(list)
         try {
-            File(pathToWrite).bufferedWriter().use { out ->
+            File(userPath).bufferedWriter().use { out ->
                 out.write(jsonArray)
             }
         } catch (e: Exception) {
@@ -37,18 +30,18 @@ class RestaurantSerializer {
 
 
     // deserialize any type of array in program
-    fun <T> deserialize(path: String): MutableList<T> {
+    fun deserializeUsers(): MutableList<User> {
 
         try {
             val mapper = jacksonObjectMapper()
             mapper.registerKotlinModule()
             mapper.registerModule(JavaTimeModule())
 
-            val encoded = Files.readAllBytes(Paths.get(path))
+            val encoded = Files.readAllBytes(Paths.get(userPath))
             val content = String(encoded, Charsets.UTF_8)
-            return mapper.readValue<MutableList<T>>(content)
+            return mapper.readValue<MutableList<User>>(content)
         } catch (e: IOException) {
-            throw EmptyFileException("Seems like there are no users now.")
+            return mutableListOf<User>()
         }
 
 

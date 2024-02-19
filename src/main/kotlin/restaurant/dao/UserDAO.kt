@@ -1,6 +1,6 @@
 package restaurant.dao
 
-import restaurant.entity.users.User
+import restaurant.entity.User
 
 interface UserDAO {
 

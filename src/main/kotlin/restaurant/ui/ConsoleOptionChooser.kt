@@ -2,7 +2,7 @@ package restaurant.ui
 
 import restaurant.DB.SerializationDB
 import restaurant.auth.AuthorizatorDB
-import restaurant.entity.users.User
+import restaurant.entity.User
 import restaurant.exceptions.WrongAuthorizationException
 
 class ConsoleOptionChooser : OptionChooser {

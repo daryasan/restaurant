@@ -1,6 +1,6 @@
 package restaurant.DB
 
-import restaurant.entity.users.User
+import restaurant.entity.User
 
 interface DataBaseDAO {
 

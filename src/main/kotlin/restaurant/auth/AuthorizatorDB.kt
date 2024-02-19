@@ -3,40 +3,38 @@ package restaurant.auth
 import restaurant.DB.DataBaseDAO
 import restaurant.dao.RuntimeUserDAO
 import restaurant.dao.UserDAO
-import restaurant.entity.users.AdminUser
-import restaurant.entity.users.OrdinaryUser
-import restaurant.entity.users.User
+import restaurant.entity.User
 import restaurant.exceptions.EmptyFileException
 import restaurant.exceptions.UserNotFoundException
 import restaurant.exceptions.WrongAuthorizationException
-import java.io.IOException
 
 class AuthorizatorDB(val db: DataBaseDAO) : Authorizator {
 
     // creating new user
     override fun signUp(login: String, password: String, isAdmin: Boolean): User {
-        try {
-            if (db.userIsInDB(login)) {
-                return signIn(login, password)
-            }
-        } finally {
-            val userDAO: UserDAO = RuntimeUserDAO()
-            if (isAdmin) {
-                val user: AdminUser = AdminUser(
-                    login,
-                    userDAO.getPasswordHash(password)
-                )
-                db.addUser(user)
-                return user
-            } else {
-                val user: OrdinaryUser = OrdinaryUser(
-                    login,
-                    userDAO.getPasswordHash(password)
-                )
-                db.addUser(user)
-                return user
-            }
+
+        if (db.userIsInDB(login)) {
+            throw WrongAuthorizationException("Seems like you are already registered! Sing in, please!")
         }
+        val userDAO: UserDAO = RuntimeUserDAO()
+        return if (isAdmin) {
+            val user = User(
+                login,
+                userDAO.getPasswordHash(password),
+                true
+            )
+            db.addUser(user)
+            user
+        } else {
+            val user = User(
+                login,
+                userDAO.getPasswordHash(password),
+                false
+            )
+            db.addUser(user)
+            user
+        }
+
 
     }
 

@@ -1,16 +1,15 @@
 package restaurant.DB
 
-import restaurant.entity.users.User
+import restaurant.entity.User
 import restaurant.exceptions.EmptyFileException
 import restaurant.exceptions.UserNotFoundException
-import java.io.IOException
 
 class SerializationDB : DataBaseDAO {
 
     val serializer: RestaurantSerializer = RestaurantSerializer()
 
     override fun searchUser(login: String): User {
-        val users = serializer.deserialize<User>(serializer.userPath)
+        val users = serializer.deserializeUsers()
         for (u in users) {
             if (u.login == login) {
                 return u
@@ -21,18 +20,18 @@ class SerializationDB : DataBaseDAO {
 
     override fun addUser(user: User) {
         try {
-            val users = serializer.deserialize<User>(serializer.userPath)
+            val users = serializer.deserializeUsers()
             users.add(user)
-            serializer.serialize(users)
+            serializer.serializeUsers(users)
         } catch (e: EmptyFileException) {
             val users = mutableListOf(user)
-            serializer.serialize(users)
+            serializer.serializeUsers(users)
         }
 
     }
 
     override fun userIsInDB(login: String): Boolean {
-        val users = serializer.deserialize<User>(serializer.userPath)
+        val users = serializer.deserializeUsers()
         for (u in users) {
             if (u.login == login) {
                 return true
