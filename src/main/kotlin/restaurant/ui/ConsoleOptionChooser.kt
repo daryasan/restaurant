@@ -1,8 +1,12 @@
 package restaurant.ui
 
+import currentUser
 import restaurant.DB.SerializationDB
 import restaurant.auth.Authorizator
 import restaurant.auth.AuthorizatorDB
+import restaurant.dao.MenuDAO
+import restaurant.dao.RuntimeMenuDAO
+import restaurant.entity.Dish
 import restaurant.entity.User
 import restaurant.exceptions.WrongAuthorizationException
 import restaurant.ui.enums.AuthOptions
@@ -11,12 +15,16 @@ import restaurant.ui.enums.EnumChooser
 class ConsoleOptionChooser : OptionChooser {
 
     private val db: SerializationDB = SerializationDB()
-    val checker: Checker = Checker()
-    val auth: Authorizator = AuthorizatorDB(db)
-    val enumChooser = EnumChooser()
-    var context: UserContext = UserContext(VisitorUserStrategy())
+    private val checker: Checker = Checker()
+    private val auth: Authorizator = AuthorizatorDB(db)
+    private val enumChooser = EnumChooser()
+    private val menu: MenuDAO = RuntimeMenuDAO()
+
 
     override fun authorize(): User {
+
+        currentUser = User("notAuthorized", "null", false)
+
         printSeparator()
         println("DO YOU HAVE AN ACCOUNT?")
         println("Print 1 if you want to sign in.")
@@ -27,21 +35,21 @@ class ConsoleOptionChooser : OptionChooser {
 
         try {
             println("Enter login:")
-            var login = checker.checkStringInput()
+            val login = checker.checkStringInput()
             println("Enter password:")
             val password = checker.checkStringInput()
 
-            when (opt) {
+            return when (opt) {
                 AuthOptions.SIGN_IN -> {
                     printSeparator()
-                    return auth.signIn(login, password)
+                    auth.signIn(login, password)
                 }
 
                 AuthOptions.SIGN_UP -> {
-                    println("Are you an administrator? Enter Y or N:")
+                    println("Are you an administrator?")
                     val isAdmin = checker.checkYesOrNo()
                     printSeparator()
-                    return auth.signUp(login, password, isAdmin)
+                    auth.signUp(login, password, isAdmin)
                 }
             }
         } catch (e: WrongAuthorizationException) {
@@ -52,16 +60,34 @@ class ConsoleOptionChooser : OptionChooser {
 
 
     override fun getConsoleMenu(user: User) {
-        if (user.isAdmin) {
-            context = UserContext(AdminUserStrategy())
+        val context: UserContext = if (user.isAdmin) {
+            UserContext(AdminUserStrategy())
         } else {
-            context = UserContext(VisitorUserStrategy())
+            UserContext(VisitorUserStrategy())
         }
         context.showMenu()
     }
 
     fun printSeparator() {
         println("---------------------------------")
+    }
+
+    private fun printMenu() {
+        printSeparator()
+        println("MENU:")
+        val menuDishes = menu.getMenu().dishes
+        for (i in 0..<menuDishes.size) {
+            println("${i + 1}.${menuDishes[i]}")
+        }
+        printSeparator()
+    }
+
+    fun getItemFromMenuByConsole(): Dish {
+        printMenu()
+        val menuDishes = menu.getMenu().dishes
+        println("Enter number of a dish from menu to choose it:")
+        val num = checker.checkRangeNumberInput(1, menuDishes.size)
+        return menuDishes[num - 1]
     }
 
 

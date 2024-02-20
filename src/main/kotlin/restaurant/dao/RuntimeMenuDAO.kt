@@ -4,13 +4,12 @@ import restaurant.DB.RestaurantSerializer
 import restaurant.entity.Dish
 import restaurant.entity.Menu
 import restaurant.exceptions.DishException
-import kotlin.time.Duration
 
 class RuntimeMenuDAO : MenuDAO {
 
     val serializer = RestaurantSerializer()
     override fun addDish(dish: Dish) {
-        var dishes = serializer.deserializeDishes()
+        val dishes = serializer.deserializeDishes()
         dishes.add(dish)
         serializer.serializeDishes(dishes)
     }
@@ -31,13 +30,15 @@ class RuntimeMenuDAO : MenuDAO {
     }
 
     override fun updateDish(dish: Dish) {
-        var dishes = serializer.deserializeDishes()
+        val dishes = serializer.deserializeDishes()
         for (i in 0..<dishes.size) {
             if (dishes[i].name == dish.name) {
                 dishes[i] = dish
+                serializer.serializeDishes(dishes)
                 return
             }
         }
+
         throw DishException("Such dish doesn't exist!")
     }
 

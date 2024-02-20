@@ -1,8 +1,6 @@
 package restaurant.ui
 
 import restaurant.exceptions.UIException
-import restaurant.ui.enums.AdminOptions
-import restaurant.ui.enums.AuthOptions
 
 class Checker {
 
@@ -23,6 +21,7 @@ class Checker {
         errorMessage: String =
             "Sorry, wrong letter entered! Try again."
     ): Boolean {
+        println("Enter Y for yes or N for no:")
         var line = readlnOrNull()
         while (line == null || (line != "Y" && line != "N")) {
             println(errorMessage)
@@ -59,16 +58,14 @@ class Checker {
             line = readlnOrNull()
         }
 
-        var num: Int? = line.toIntOrNull()
+        val num: Int? = line.toIntOrNull()
 
         if (num == null || num < leftBorder || num > rightBorder) {
             println(errorMessage)
             return checkRangeNumberInput(leftBorder, rightBorder, errorMessage)
         }
         return num
-
     }
-
 
 
 }

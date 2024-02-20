@@ -1,9 +1,9 @@
 import restaurant.entity.User
 import restaurant.ui.ConsoleOptionChooser
-import restaurant.ui.UserContext
 
 val optionChooser: ConsoleOptionChooser = ConsoleOptionChooser()
 var currentUser: User = optionChooser.authorize()
+var revenue: Int = 0
 
 fun main(args: Array<String>) {
 

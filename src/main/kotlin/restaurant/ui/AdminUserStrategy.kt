@@ -7,24 +7,30 @@ import restaurant.dao.RuntimeMenuDAO
 import restaurant.entity.Dish
 import restaurant.ui.enums.AdminOptions
 import restaurant.ui.enums.EnumChooser
+import revenue
 import kotlin.system.exitProcess
 
 class AdminUserStrategy : UserStrategy {
 
-    val console: ConsoleOptionChooser = ConsoleOptionChooser()
-    val checker: Checker = Checker()
-    val enumChooser = EnumChooser()
-    val menu: MenuDAO = RuntimeMenuDAO()
-    val dishDAO = RuntimeDishDAO()
+    // some initializations
+    private val console: ConsoleOptionChooser = ConsoleOptionChooser()
+    private val checker: Checker = Checker()
+    private val enumChooser = EnumChooser()
+    private val menu: MenuDAO = RuntimeMenuDAO()
+    private val dishDAO = RuntimeDishDAO()
+
+    // strategy method
     override fun getMenu() {
         console.printSeparator()
         println("WHAT DO YOU WANT TO DO?")
         println("1.ADD NEW DISH TO MENU")
         println("2.EDIT DISH FROM MENU")
-        println("3.LOG OUT")
-        println("4.EXIT")
+        println("3.SEE CURRENT REVENUE")
+        println("4.LOG OUT")
+        println("5.EXIT")
         console.printSeparator()
 
+        // options
         when (enumChooser.checkAdminOption()) {
             AdminOptions.ADD_DISH -> {
                 println("Enter dish name:")
@@ -33,7 +39,7 @@ class AdminUserStrategy : UserStrategy {
                 val price = checker.checkIntInput()
                 println("Enter the amount of dishes:")
                 val amount = checker.checkIntInput()
-                println("How long will it take to cook the ${name} in minutes?")
+                println("How long will it take to cook the $name in minutes?")
                 println("Enter number of minutes:")
                 val min = checker.checkIntInput()
                 menu.addDish(name, price, amount, min)
@@ -42,16 +48,12 @@ class AdminUserStrategy : UserStrategy {
 
             AdminOptions.EDIT_DISH -> {
                 console.printSeparator()
-                println("MENU:")
-                val menuDishes = menu.getMenu().dishes
-                for (i in 0..<menuDishes.size) {
-                    println("${i + 1}.${menuDishes[i]}")
-                }
-                console.printSeparator()
-                println("Enter number of a dish from menu:")
-                val num = checker.checkRangeNumberInput(1, menuDishes.size)
-                editDish(menuDishes[num - 1])
+                editDish(console.getItemFromMenuByConsole())
                 println("Successfully edited!")
+            }
+
+            AdminOptions.SEE_REVENUE ->{
+                println("Current revenue: $revenue")
             }
 
             AdminOptions.LOG_OUT -> {
@@ -67,12 +69,15 @@ class AdminUserStrategy : UserStrategy {
         console.printSeparator()
     }
 
+
+    // additional menu to choose what to edit
     private fun editDish(dish: Dish) {
         println("1.PRESS 1 TO EDIT DISH PRICE")
         println("2.PRESS 2 TO EDIT DISH AMOUNT")
         println("3.PRESS 3 TO EDIT DISH DIFFICULTY")
 
-        val opt = checker.checkRangeNumberInput(1, 4)
+        val opt = checker.checkRangeNumberInput(1, 3)
+        // options
         when (opt) {
 
             1 -> {

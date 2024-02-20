@@ -1,10 +1,9 @@
 package restaurant.DB
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import restaurant.entity.Dish
+import restaurant.entity.Order
 import restaurant.entity.User
 import java.io.File
 import java.io.IOException
@@ -14,8 +13,9 @@ import java.nio.file.Paths
 class RestaurantSerializer {
 
     private val path = "src/main/resources/jsonDB/"
-    val userPath = "${path}users.json"
-    val menuPath = "${path}menu.json"
+    private val userPath = "${path}users.json"
+    private val menuPath = "${path}menu.json"
+    private val ordersPath = "${path}orders.json"
 
     fun serializeUsers(list: MutableList<User>) {
 
@@ -31,16 +31,12 @@ class RestaurantSerializer {
 
 
     fun deserializeUsers(): MutableList<User> {
-        try {
-            val mapper = jacksonObjectMapper()
-            mapper.registerKotlinModule()
-            mapper.registerModule(JavaTimeModule())
-
+        return try {
             val encoded = Files.readAllBytes(Paths.get(userPath))
             val content = String(encoded, Charsets.UTF_8)
-            return mapper.readValue<MutableList<User>>(content)
+            jacksonObjectMapper().readValue<MutableList<User>>(content)
         } catch (e: IOException) {
-            return mutableListOf()
+            mutableListOf()
         }
     }
 
@@ -57,16 +53,34 @@ class RestaurantSerializer {
     }
 
     fun deserializeDishes(): MutableList<Dish> {
-        try {
-            val mapper = jacksonObjectMapper()
-            mapper.registerKotlinModule()
-            mapper.registerModule(JavaTimeModule())
-
+        return try {
             val encoded = Files.readAllBytes(Paths.get(menuPath))
             val content = String(encoded, Charsets.UTF_8)
-            return mapper.readValue<MutableList<Dish>>(content)
+            jacksonObjectMapper().readValue<MutableList<Dish>>(content)
         } catch (e: IOException) {
-            return mutableListOf()
+            mutableListOf()
+        }
+    }
+
+    fun serializeOrders(list: MutableList<Order>) {
+
+        val jsonArray = jacksonObjectMapper().writeValueAsString(list)
+        try {
+            File(ordersPath).bufferedWriter().use { out ->
+                out.write(jsonArray)
+            }
+        } catch (e: Exception) {
+            println(e.message)
+        }
+    }
+
+    fun deserializeOrders(): MutableList<Order> {
+        return try {
+            val encoded = Files.readAllBytes(Paths.get(ordersPath))
+            val content = String(encoded, Charsets.UTF_8)
+            jacksonObjectMapper().readValue<MutableList<Order>>(content)
+        } catch (e: IOException) {
+            mutableListOf()
         }
     }
 

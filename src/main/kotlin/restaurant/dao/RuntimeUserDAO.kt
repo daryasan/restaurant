@@ -1,5 +1,6 @@
 package restaurant.dao
 
+import currentUser
 import restaurant.entity.User
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
@@ -17,6 +18,10 @@ class RuntimeUserDAO : UserDAO {
             sb.append(String.format("%02x", b))
         }
         return sb.toString()
+    }
+
+    override fun isLoggedIn(user: User): Boolean {
+        return user.login == currentUser.login
     }
 
 }
