@@ -1,14 +1,14 @@
 package restaurant.ui
 
-import currentUser
+import restaurant.Utils
 import restaurant.dao.MenuDAO
 import restaurant.dao.RuntimeDishDAO
 import restaurant.dao.RuntimeMenuDAO
 import restaurant.entity.Dish
 import restaurant.ui.enums.AdminOptions
 import restaurant.ui.enums.EnumChooser
-import revenue
 import kotlin.system.exitProcess
+import currentUser as currentUser1
 
 class AdminUserStrategy : UserStrategy {
 
@@ -52,12 +52,12 @@ class AdminUserStrategy : UserStrategy {
                 println("Successfully edited!")
             }
 
-            AdminOptions.SEE_REVENUE ->{
-                println("Current revenue: $revenue")
+            AdminOptions.SEE_REVENUE -> {
+                println("Current revenue: ${Utils.getRevenue()}")
             }
 
             AdminOptions.LOG_OUT -> {
-                currentUser = console.authorize()
+                currentUser1 = console.authorize()
                 return
             }
 

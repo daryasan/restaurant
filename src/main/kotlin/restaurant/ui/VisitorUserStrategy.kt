@@ -1,12 +1,14 @@
 package restaurant.ui
 
 import currentUser
+import restaurant.dao.RuntimeDishDAO
 import restaurant.dao.RuntimeOrderDAO
 import restaurant.entity.Order
 import restaurant.exceptions.OrderException
 import restaurant.ui.enums.EnumChooser
 import restaurant.ui.enums.OrderStatus
 import restaurant.ui.enums.VisitorOptions
+import java.time.LocalDateTime
 import kotlin.system.exitProcess
 
 class VisitorUserStrategy : UserStrategy {
@@ -15,6 +17,7 @@ class VisitorUserStrategy : UserStrategy {
     private val checker: Checker = Checker()
     private val enumChooser = EnumChooser()
     private val orderDAO = RuntimeOrderDAO()
+    private val dishDAO = RuntimeDishDAO()
 
     override fun getMenu() {
 
@@ -88,6 +91,10 @@ class VisitorUserStrategy : UserStrategy {
         val order = orderDAO.initOrder()
         do {
             val dish = console.getItemFromMenuByConsole()
+            if (dish.currentAmount == 0) {
+                println("Sorry! We have no ${dish.name} now. Do you want to order something else?")
+                continue
+            }
             println("How many of ${dish.name} should we make?")
             val amount = checker.checkRangeNumberInput(
                 1, dish.currentAmount,
@@ -95,6 +102,7 @@ class VisitorUserStrategy : UserStrategy {
                         "You can order under ${dish.currentAmount}!"
             )
             orderDAO.addDishToOrder(order, dish, amount)
+            dishDAO.changeAmount(dish, dish.currentAmount - amount)
             println("Added! Your total will be ${order.cost()}₽")
             println("Anything else?")
         } while (checker.checkYesOrNo())
@@ -103,15 +111,10 @@ class VisitorUserStrategy : UserStrategy {
 
     fun checkOrder() {
         if (orderDAO.userHasOrder() &&
-            orderDAO.findOrderForCurrentUser().status == OrderStatus.READY
+            (orderDAO.findOrderForCurrentUser().status == OrderStatus.READY)
         ) {
             val order = orderDAO.findOrderForCurrentUser()
             println("Your order is ready! Your total is ${order.cost()}₽")
-            println("Enter ${order.cost()} to pay:")
-            checker.checkRangeNumberInput(
-                order.cost(), order.cost(),
-                "Sorry, wrong amount to pay! Try again:"
-            )
             orderDAO.pay(order)
             println("Successfully paid!")
         }

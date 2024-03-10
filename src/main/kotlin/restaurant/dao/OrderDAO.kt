@@ -2,6 +2,7 @@ package restaurant.dao
 
 import restaurant.entity.Dish
 import restaurant.entity.Order
+import restaurant.entity.User
 import restaurant.mutlithreading.OrderThread
 
 interface OrderDAO {
@@ -17,10 +18,13 @@ interface OrderDAO {
 
     fun findOrderForCurrentUser(): Order
 
+    fun findOrderForUser(user: User): Order
+
     fun deleteCurrentUserOrder()
 
     fun updateOrder(order: Order)
 
     fun pay(order: Order)
 
+    fun userHasOrder(user: User): Boolean
 }

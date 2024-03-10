@@ -1,7 +1,9 @@
 package restaurant.DB
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import restaurant.entity.Dish
 import restaurant.entity.Order
 import restaurant.entity.User
@@ -63,8 +65,10 @@ class RestaurantSerializer {
     }
 
     fun serializeOrders(list: MutableList<Order>) {
-
-        val jsonArray = jacksonObjectMapper().writeValueAsString(list)
+        val mapper = jacksonObjectMapper()
+        mapper.registerKotlinModule()
+        mapper.registerModule(JavaTimeModule())
+        val jsonArray = mapper.writeValueAsString(list)
         try {
             File(ordersPath).bufferedWriter().use { out ->
                 out.write(jsonArray)
@@ -75,10 +79,13 @@ class RestaurantSerializer {
     }
 
     fun deserializeOrders(): MutableList<Order> {
+        val mapper = jacksonObjectMapper()
+        mapper.registerKotlinModule()
+        mapper.registerModule(JavaTimeModule())
         return try {
             val encoded = Files.readAllBytes(Paths.get(ordersPath))
             val content = String(encoded, Charsets.UTF_8)
-            jacksonObjectMapper().readValue<MutableList<Order>>(content)
+            mapper.readValue<MutableList<Order>>(content)
         } catch (e: IOException) {
             mutableListOf()
         }

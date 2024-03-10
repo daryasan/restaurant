@@ -1,11 +1,15 @@
 package restaurant.dao
 
 import currentUser
+import restaurant.DB.RestaurantSerializer
 import restaurant.entity.User
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 
 class RuntimeUserDAO : UserDAO {
+
+    val serializer = RestaurantSerializer()
+
     override fun isAdmin(user: User): Boolean {
         return user.isAdmin
     }
@@ -22,6 +26,10 @@ class RuntimeUserDAO : UserDAO {
 
     override fun isLoggedIn(user: User): Boolean {
         return user.login == currentUser.login
+    }
+
+    override fun getAllUsers(): List<User> {
+        return serializer.deserializeUsers()
     }
 
 }

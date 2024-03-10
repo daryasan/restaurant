@@ -1,7 +1,6 @@
 package restaurant.dao
 
 import restaurant.entity.Dish
-import kotlin.time.Duration
 
 class RuntimeDishDAO : DishDAO {
 

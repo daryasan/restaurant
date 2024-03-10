@@ -5,6 +5,8 @@ import restaurant.dao.RuntimeUserDAO
 import restaurant.entity.Order
 import restaurant.ui.VisitorUserStrategy
 import restaurant.ui.enums.OrderStatus
+import java.time.Duration
+import java.time.LocalDateTime
 
 class OrderThread(
     private val order: Order
@@ -16,11 +18,24 @@ class OrderThread(
 
     override fun run() {
         // wait for 30 sec for an order to proceed
-        Thread.sleep(30000)
-        order.status = OrderStatus.COOKING
-        orderDAO.updateOrder(order)
+        if (order.status != OrderStatus.COOKING) {
+            Thread.sleep(5000)
+            order.status = OrderStatus.COOKING
+            orderDAO.updateOrder(order)
+        }
+
         // wait for order to cook
-        Thread.sleep(order.difficulty().toLong() * 60000)
+        try {
+            Thread.sleep(Duration.between(LocalDateTime.now(), order.finishTime).toMillis())
+        } catch (e: Exception) {
+            order.status = OrderStatus.READY
+            orderDAO.updateOrder(order)
+            if (userDAO.isLoggedIn(order.user)) {
+                userStrategy.checkOrder()
+            }
+        }
+
+
         order.status = OrderStatus.READY
         orderDAO.updateOrder(order)
         if (userDAO.isLoggedIn(order.user)) {
